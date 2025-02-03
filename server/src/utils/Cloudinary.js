@@ -17,15 +17,17 @@ const uploadOnCloudinary = async (localFilePath) => {
             resource_type: 'image',
             public_id: uniquePublicId,
             folder: 'user_avatars',
-            allowed_formats: 'webp'
+            allowed_formats: ['webp', 'jpg', 'png']
         })
-
-        fs.unlinkSync(localFilePath);
         return response
-
     } catch (error) {
-        fs.unlinkSync(localFilePath)
         return null
+    } finally {
+        try {
+            fs.unlinkSync(localFilePath);
+        } catch (unlinkError) {
+            console.error("ERROR WHILE DELETING A FILE");
+        }
     }
 }
 

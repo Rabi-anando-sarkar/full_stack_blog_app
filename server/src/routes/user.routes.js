@@ -27,6 +27,12 @@ router.route('/signout-user').post(authenticateToken,signOutUser)
 router.route('/refresh-token').post(refreshAccessToken)
 router.route('/change-password').post(authenticateToken,changeCurrentPassword)
 router.route('/update-account').post(authenticateToken,updateAccountDetails)
-router.route('/update-avatar').post(authenticateToken,updateUserAvatar)
+router.route('/update-avatar').post(
+    upload.fields([
+        {
+            name: "avatar",
+            maxCount: 1
+        }
+    ]),authenticateToken,updateUserAvatar)
 
 export default router

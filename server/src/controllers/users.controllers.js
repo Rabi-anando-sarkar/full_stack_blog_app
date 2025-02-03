@@ -77,6 +77,8 @@ const registerUser = asyncHandler(async(req,res) => {
         avatar: avatar.secure_url
     })
 
+    await user.save()
+
     const createdUser = await User.findById(user._id).select(
         "-password -refreshToken"
     )
@@ -87,8 +89,6 @@ const registerUser = asyncHandler(async(req,res) => {
             "SOMETHING WENT WRONG REGISTERING THE USER"
         )
     }
-
-    await user.save()
 
     return res.status(201).json(
         new ApiResponse(
@@ -102,7 +102,7 @@ const registerUser = asyncHandler(async(req,res) => {
 const signInUser = asyncHandler(async(req,res) => {
     const { username,email,password } = req.body
 
-    if(!(username || email || password)) {
+    if([username,email,password].some((field) => !field?.trim())) {
         throw new ApiError(
             400,
             "ALL FIELDS ARE REQUIRED"
@@ -129,7 +129,7 @@ const signInUser = asyncHandler(async(req,res) => {
         )
     }
 
-    const {accessToken, refreshToken} = await generateAccessAndRefreshToken(User._id)
+    const {accessToken, refreshToken} = await generateAccessAndRefreshToken(user._id)
 
     const loggedInUser = await User.findById(user._id).select('-password -refreshToken')
 
@@ -322,7 +322,7 @@ const updateAccountDetails = asyncHandler(async(req,res) => {
 })
 
 const updateUserAvatar = asyncHandler(async(req,res) => {
-    const avatarLocalPath = req.file?.path
+    const avatarLocalPath = req.files?.avatar?.[0]?.path;
 
     if(!avatarLocalPath) {
         throw new ApiError(
@@ -332,6 +332,9 @@ const updateUserAvatar = asyncHandler(async(req,res) => {
     }
 
     const avatar = await uploadOnCloudinary(avatarLocalPath)
+
+    console.log('response : ',avatar);
+    
 
     if(!avatar.secure_url) {
         throw new ApiError(

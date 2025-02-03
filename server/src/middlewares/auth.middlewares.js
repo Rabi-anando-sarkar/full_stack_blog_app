@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
-import { ApiError } from '../utils/ApiError'
-import { User } from '../models/user.models'
+import { ApiError } from '../utils/ApiError.js'
+import { User } from '../models/user.models.js'
 
 const authenticateToken = async (req,_,next) => {
     try{
